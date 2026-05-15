@@ -131,14 +131,14 @@ Malicious Ranking:
 Install PdfSentinel using git 
 
 ```bash
-git clone https://github.com/yourusername/pdf-sentinel.git
-cd pdf-sentinel
+git clone https://github.com/DaddyUchiha/PdfSentinel
+cd PdfSentinel
 pip install requests
 ```
 
 ## Usage
 ```bash
-python3 pdf_sentinel.py
+python3 PdfSentinel.py
 ```
 Enter the absolute path of the PDF file when prompted.
 
