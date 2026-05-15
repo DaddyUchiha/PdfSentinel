@@ -9,6 +9,7 @@ import binascii
 from collections import Counter
 from datetime import datetime
 import requests 
+from pypdf import PdfReader
 
 
 red = '\033[91m'
@@ -38,7 +39,7 @@ logo = f"""{red}
 
 print(logo)
 print(f"{cyan}={'=' * 80}{reset}")
-pdf_file = input(f"{green}Enter PDF path: {reset}").strip()
+pdf_file = input(f"{green}Enter PDF path: {reset}")
 print(f"{cyan}={'=' * 80}{reset}")
 if not os.path.isfile(pdf_file):
     print(f"{red}[!] File not found. Please provide Absolute path: {reset}")
@@ -107,6 +108,47 @@ print(f"{red}SHA256:{reset}", sha256(raw))
 print(f"{red}Entropy:{reset}", round(entropy(raw), 2))
 
 risk = 0
+
+reader = PdfReader(pdf_file)
+
+print()
+# =====================
+# 📄 METADATA
+# =====================
+print("" + "=" * 80)
+print("\033[92m[+] Metadata:\033[0m")
+print("" + "=" * 80)
+meta = reader.metadata
+
+if meta:
+    print("Title:", meta.title)
+    print("Author:", meta.author)
+    print("Creator:", meta.creator)
+    print("Producer:", meta.producer)
+    print("Creation Date:", meta.creation_date)
+else:
+    print("No metadata found")
+
+# =====================
+# 🚨 SUSPICIOUS KEYS
+# =====================
+suspicious_keys = [
+    "/JavaScript",
+    "/JS",
+    "/OpenAction",
+    "/AA",
+    "/Launch",
+    "/EmbeddedFile"
+]
+print("" + "=" * 80)
+print("\033[92m[+] Checking PDF structure...\033[0m")
+root = reader.trailer["/Root"]
+
+for key in suspicious_keys:
+    if key in root:
+        print(f"\033[91m[!] Found {key} in Root\033[0m")
+        risk += 5
+
 
 # ===============================
 # IOC DETECTION
@@ -344,5 +386,6 @@ elif risk <= 100:
     print(f"{red}[HIGH RISK Found ] || Threat Score: {risk}{reset}")
 else:
     print(f"{red}[CRITICAL - EXTREMELY DANGEROUS]{reset}")
+print("" + "=" * 80)
 print(f"{green}Scan Completed: {datetime.now()}{reset}")
 
